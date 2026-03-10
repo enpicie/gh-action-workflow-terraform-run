@@ -18,7 +18,12 @@ terraform {
 
 ```yaml
 name: Deploy Infrastructure
-...
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -31,6 +36,8 @@ jobs:
           aws_role_arn: ${{ vars.TF_ROLE_APIGW_LAMBDA }}
           state_key: projects/my-app/prod/infra.tfstate
 ```
+
+````
 
 ## Inputs
 
@@ -56,7 +63,7 @@ Use `tf_vars` to pass values to your Terraform input variables. Each line must b
       TF_VAR_app_name=my-app
       TF_VAR_environment=prod
       TF_VAR_instance_class=t3.micro
-```
+````
 
 For sensitive values, reference GitHub Actions secrets inline:
 
