@@ -1,0 +1,82 @@
+name: 'Terraform Run'
+description: 'Run and apply Terraform using OpenTofu with S3 backend and OIDC auth'
+
+inputs:
+  aws_role_arn:
+    description: 'IAM role ARN to assume via OIDC (determines what can be provisioned)'
+    required: true
+  aws_region:
+    description: 'AWS region'
+    required: false
+    default: 'us-east-1'
+  state_key:
+    description: 'S3 key for this project state (e.g. projects/my-app/prod/infra.tfstate)'
+    required: true
+  working_directory:
+    description: 'Path to Terraform configuration'
+    required: false
+    default: '.'
+  tf_vars:
+    description: 'Newline-separated TF_VAR_* env vars (e.g. TF_VAR_foo=bar)'
+    required: false
+    default: ''
+  apply:
+    description: 'Whether to apply after planning (set to false for plan-only on PRs)'
+    required: false
+    default: 'true'
+
+env:
+  # Provisioned by aws-bootstrap/cloudformation/backend.yml
+  # Bucket name is <account-id>-terraform-state, resolved at runtime from AWS caller identity
+  TF_LOCK_TABLE: terraform-state-locks
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ inputs.aws_role_arn }}
+        aws-region: ${{ inputs.aws_region }}
+
+    - name: Resolve state bucket name
+      shell: bash
+      run: |
+        ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+        echo "TF_STATE_BUCKET=${ACCOUNT_ID}-terraform-state" >> $GITHUB_ENV
+
+    - name: Setup OpenTofu
+      uses: opentofu/setup-opentofu@v1
+
+    - name: Set TF vars
+      if: inputs.tf_vars != ''
+      shell: bash
+      run: |
+        while IFS= read -r line; do
+          [[ -z "$line" ]] && continue
+          echo "$line" >> $GITHUB_ENV
+        done <<< "${{ inputs.tf_vars }}"
+
+    - name: Init
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        tofu init \
+          -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" \
+          -backend-config="key=${{ inputs.state_key }}" \
+          -backend-config="region=${{ inputs.aws_region }}" \
+          -backend-config="dynamodb_table=${{ env.TF_LOCK_TABLE }}"
+
+    - name: Plan
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: tofu plan -out=tfplan
+
+    - name: Apply
+      if: inputs.apply == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: tofu apply tfplan
