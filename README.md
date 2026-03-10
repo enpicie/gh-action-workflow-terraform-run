@@ -38,18 +38,16 @@ jobs:
           state_key: projects/my-app/prod/infra.tfstate
 ```
 
-````
-
 ## Inputs
 
-| Name                | Description                                                                | Required | Default     |
-| ------------------- | -------------------------------------------------------------------------- | -------- | ----------- |
-| `aws_role_arn`      | IAM role ARN to assume via OIDC — controls what this project can provision | Yes      |             |
-| `state_key`         | S3 path for this project's state file (see [State Key](#state-key))        | Yes      |             |
-| `aws_region`        | AWS region                                                                 | No       | `us-east-1` |
-| `working_directory` | Path to Terraform configuration directory                                  | No       | `.`         |
-| `tf_vars`           | Terraform input variables (see [Passing Variables](#passing-variables))    | No       | `''`        |
-| `apply`             | Whether to apply after planning — set to `'false'` for plan-only on PRs    | No       | `'true'`    |
+| Name           | Description                                                                | Required | Default     |
+| -------------- | -------------------------------------------------------------------------- | -------- | ----------- |
+| `aws_role_arn` | IAM role ARN to assume via OIDC — controls what this project can provision | Yes      |             |
+| `state_key`    | S3 path for this project's state file (see [State Key](#state-key))        | Yes      |             |
+| `aws_region`   | AWS region                                                                 | No       | `us-east-1` |
+| `tf_directory` | Path to Terraform configuration directory                                  | No       | `.`         |
+| `tf_vars`      | Terraform input variables (see [Passing Variables](#passing-variables))    | No       | `''`        |
+| `apply`        | Whether to apply after planning — set to `'false'` for plan-only on PRs    | No       | `'true'`    |
 
 ## Passing Variables
 
@@ -64,7 +62,7 @@ Use `tf_vars` to pass values to your Terraform input variables. Each line must b
       TF_VAR_app_name=my-app
       TF_VAR_environment=prod
       TF_VAR_instance_class=t3.micro
-````
+```
 
 For sensitive values, reference GitHub Actions secrets inline:
 

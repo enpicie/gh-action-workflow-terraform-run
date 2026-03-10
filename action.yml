@@ -12,7 +12,7 @@ inputs:
   state_key:
     description: 'S3 key for this project state (e.g. projects/my-app/prod/infra.tfstate)'
     required: true
-  working_directory:
+  tf_directory:
     description: 'Path to Terraform configuration'
     required: false
     default: '.'
@@ -62,7 +62,7 @@ runs:
 
     - name: Init
       shell: bash
-      working-directory: ${{ inputs.working_directory }}
+      working-directory: ${{ inputs.tf_directory }}
       run: |
         tofu init \
           -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" \
@@ -72,11 +72,11 @@ runs:
 
     - name: Plan
       shell: bash
-      working-directory: ${{ inputs.working_directory }}
+      working-directory: ${{ inputs.tf_directory }}
       run: tofu plan -out=tfplan
 
     - name: Apply
       if: inputs.apply == 'true'
       shell: bash
-      working-directory: ${{ inputs.working_directory }}
+      working-directory: ${{ inputs.tf_directory }}
       run: tofu apply tfplan
