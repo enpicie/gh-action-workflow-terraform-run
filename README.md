@@ -44,7 +44,7 @@ jobs:
 | -------------- | -------------------------------------------------------------------------- | -------- | ----------- |
 | `aws_role_arn` | IAM role ARN to assume via OIDC — controls what this project can provision | Yes      |             |
 | `state_key`    | S3 path for this project's state file (see [State Key](#state-key))        | Yes      |             |
-| `aws_region`   | AWS region                                                                 | No       | `us-east-1` |
+| `aws_region`   | AWS region                                                                 | No       | `us-east-2` |
 | `tf_directory` | Path to Terraform configuration directory                                  | No       | `.`         |
 | `tf_vars`      | Terraform input variables (see [Passing Variables](#passing-variables))    | No       | `''`        |
 | `apply`        | Whether to apply after planning — set to `'false'` for plan-only on PRs    | No       | `'true'`    |

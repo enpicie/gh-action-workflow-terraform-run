@@ -8,7 +8,7 @@ inputs:
   aws_region:
     description: 'AWS region'
     required: false
-    default: 'us-east-1'
+    default: 'us-east-2'
   state_key:
     description: 'S3 key for this project state (e.g. projects/my-app/prod/infra.tfstate)'
     required: true
