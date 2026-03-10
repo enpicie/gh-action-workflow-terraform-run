@@ -21,7 +21,8 @@ name: Deploy Infrastructure
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
 
 jobs:
