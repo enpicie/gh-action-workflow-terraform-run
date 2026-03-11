@@ -87,14 +87,14 @@ variable "db_password" {
 The `state_key` is the S3 path where this project's Terraform state file is stored. It must be unique per project and consistent across runs. The recommended convention is:
 
 ```
-projects/{app-name}/{environment}/configname.tfstate
+projects/{app-name}/{environment}/infra.tfstate
 ```
 
-Configs should be named for their use case, which should typically be the app name. For example:
+Since app name should be in path to .tfstate, file can be named generally for what it configures. For example:
 
 ```
-projects/my-app/prod/myapp.tfstate
-projects/my-app/dev/myapp.tfstate
+projects/my-app/prod/infra.tfstate
+projects/my-app/dev/infra.tfstate
 ```
 
 ## Plan vs Apply
