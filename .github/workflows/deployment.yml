@@ -30,6 +30,10 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Verify identity
+        shell: bash
+        run: aws sts get-caller-identity
+
       - name: Deploy CloudFormation template
         run: |
           aws cloudformation deploy \
