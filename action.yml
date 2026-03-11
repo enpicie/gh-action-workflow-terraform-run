@@ -24,6 +24,10 @@ inputs:
     description: 'Whether to apply after planning (set to false for plan-only on PRs)'
     required: false
     default: 'true'
+  github_token:
+    description: 'GitHub PAT for Terraform GitHub provider (required only when managing GitHub resources)'
+    required: false
+    default: ''
 
 env:
   # Provisioned by aws-bootstrap/cloudformation/backend.yml
@@ -47,6 +51,11 @@ runs:
       run: |
         ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
         echo "TF_STATE_BUCKET=${ACCOUNT_ID}-terraform-state" >> $GITHUB_ENV
+
+    - name: Set GitHub token
+      if: inputs.github_token != ''
+      shell: bash
+      run: echo "GITHUB_TOKEN=${{ inputs.github_token }}" >> $GITHUB_ENV
 
     - name: Setup OpenTofu
       uses: opentofu/setup-opentofu@v1
