@@ -69,6 +69,15 @@ runs:
           echo "$line" >> $GITHUB_ENV
         done <<< "${{ inputs.tf_vars }}"
 
+    - name: Verify S3 backend configured
+      shell: bash
+      working-directory: ${{ inputs.tf_directory }}
+      run: |
+        if ! grep -r 'backend\s*"s3"' . --include="*.tf" -q; then
+          echo "Error: No S3 backend block found in Terraform config. A backend \"s3\" {} block is required to prevent stateless applies."
+          exit 1
+        fi
+
     - name: Init
       shell: bash
       working-directory: ${{ inputs.tf_directory }}
